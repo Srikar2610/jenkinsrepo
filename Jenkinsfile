@@ -1,20 +1,24 @@
 pipeline {
     agent any
     stages {
-        stage('Install Python and Dependencies') {
+        stage('Install Dependencies') {
             steps {
-                sh 'python3 --version'  // Check Python version
-                sh 'pip install -r requirements.txt || true'  // Install dependencies if requirements.txt exists
+                sh 'pip install -r requirements.txt'
             }
         }
-        stage('Run Python Script') {
+        stage('Run Tests') {
             steps {
-                sh 'python3 app.py'
+                sh 'pytest tests/'
             }
         }
-        stage('Archive Output') {
+        stage('Build Artifact') {
             steps {
-                archiveArtifacts artifacts: 'output.txt', fingerprint: true
+                sh 'python setup.py sdist'
+            }
+        }
+        stage('Archive Artifact') {
+            steps {
+                archiveArtifacts artifacts: 'dist/*.tar.gz', fingerprint: true
             }
         }
     }
